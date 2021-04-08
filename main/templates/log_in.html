@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %} Log In {% endblock title %}
+
+{% block body %}
+
+<div class="container col-md-4 mt-5">    
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+
+    <form class="form-signin" method="POST">
+
+        {% if error_message %}
+        <div class="alert alert-dark p-2">
+            {{error_message}}
+        </div>
+        {% endif %}
+
+        {% csrf_token %}      
+
+        <label for="email" class="sr-only">User name</label>
+        <input type="text" name="username" class="form-control" placeholder="Username">
+
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Password">
+
+        <button class="btn btn-md btn-primary btn-block mt-1" type="submit">Sign in</button>
+
+    </form>
+
+</div>
+
+{% endblock body %}

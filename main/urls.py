@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 from main import views
 urlpatterns = [
-    path('', views.index),
+    path('', views.index, name='homepage'),
     path('login/', views.user_login, name='login'),
     path('chat/', views.chat, name='chat'),
     path('chat/<str:room_name>/', views.chat_room, name='chat_room'),
