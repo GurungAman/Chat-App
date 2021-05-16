@@ -1,10 +1,10 @@
 from django.core.checks import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from main.models import Room
+from main.models import Room, Message
+
 
 # Create your views here.
 @login_required(login_url='login')
@@ -20,13 +20,15 @@ def index(request):
 def chat_room(request, room_name):
     try:
         room = Room.objects.get(room=room_name)
+        message = reversed(room.message_set.order_by('-timestamp')[:15])
     except:
         messages.info(request, "Room Does not exist!")
         return redirect('homepage')
     return render(request,
             template_name = 'chat_room.html',
-            context = {'room_name': room_name}
-            )
+            context = {'room_name': room_name,
+                        'message': message
+                        })
 
 
 def user_login(request):
