@@ -11,6 +11,10 @@ from main.models import Room, Message
 def index(request):
     if request.method == "POST":
         room_name = request.POST['room-name-input']
+        room_name = room_name.strip()
+        if room_name == "":
+            messages.info(request, "Room Name cannot be empty.!")
+            return redirect('homepage')
         room, _ = Room.objects.get_or_create(room=room_name)
         return redirect(chat_room, room_name=room)
     return render(request, template_name = 'index.html')
