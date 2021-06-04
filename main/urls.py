@@ -19,5 +19,7 @@ from main import views
 urlpatterns = [
     path('', views.index, name='homepage'),
     path('login/', views.user_login, name='login'),
-    path('chat/<str:room_name>/', views.chat_room, name='chat_room'),
+    path('create_chat_room/', views.create_chat_room, name='create_chat_room'),
+    path('chat/<slug:room_name>/', views.chat_room, name='chat_room'),
+    path('leave_room/', views.leave_room, name='leave_room'),
 ]

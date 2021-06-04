@@ -3,11 +3,23 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Room(models.Model):
-    room = models.CharField(max_length=50)
+    room = models.SlugField(max_length=50, unique=True)
+    user_admin = models.ForeignKey(User,on_delete=models.CASCADE)
+    # Users who can join the chat Room
+    approved_users = models.ManyToManyField(User, related_name='approved_users', blank=True)
+    # Users on hold waiting to be approved to join the chat Room
+    pending_requests = models.ManyToManyField(User, related_name='pending_requests', blank=True)
+    is_private = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
 
     def __str__(self):
         return self.room
 
+    def get_approved_users(self):
+        return self.approved_users.all()
+    
+    def get_pending_requests(self):
+        return self.pending_requests.all()
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

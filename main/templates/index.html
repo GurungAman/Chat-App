@@ -5,19 +5,79 @@
 
 {% block body %} 
 
-<div class="container mt-4 text-center">    
-    
-    <form class="form-signin" method="POST">
-
-        {% csrf_token %}     
+<div class="container mt-5">    
+  
          
-        <h1 class="text-center">What chat room would you like to enter?</h1>
-        <input id="room-name-input" name="room-name-input" type="text" size="100" placeholder="Room name">
-        <br>
-        <button class="btn btn-md btn-primary mt-1" type="submit">Enter</button>
+    <h1 class="text-center">Welcome {{request.user}}.!</h1>
+    <div class="row">
+        <div class="col-12 text-center">
+            <input id="room-name-input" type="text" size="70" placeholder="Enter name of a room">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 text-center">
+            
+            <!-- Button trigger modal -->
+            <button type="button" id="create-chat-room" class="btn btn-dark mt-1 mx-3" data-toggle="modal" data-target="#ModalCenter">
+                Create Room
+            </button>
+            <button type="button" id="join-chat-room" class="btn btn-dark mt-1 mx-3">
+                Join Room
+            </button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="ModalTitle">  </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check text-center">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="is_public" checked>
+                              Public chat room
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="is_private">
+                              Private Chat room
+                          </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Create Room</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        
 
-    </form>
-
+    <div class="row mt-4">
+        <div class="col-md-6 col-sm-12">
+            <h3 class='text-center'> Rooms you have created.</h3>
+            {% for room in rooms_created %}
+            <div class='text-center'><a href="{% url 'chat_room' room_name=room %}">{{room}}</a></div>
+            {% endfor %}
+        </div>
+    
+        <div class="col-md-6 col-sm-12">
+            <h3 class='text-center'>Rooms you have joined.</h3>
+            {% for room in rooms_joined %}
+            <div class='text-center'><a href="{% url 'chat_room' room_name=room %}">{{room}}</a></div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
+<script>
+    document.querySelector('#create-chat-room').onclick = function(e) {
+        const room_name = document.querySelector('#room-name-input').value;
+        document.querySelector('#ModalTitle').textContent = room_name;
+          
+    };
+</script>
 {% endblock body %}
