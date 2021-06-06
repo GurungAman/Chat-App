@@ -1,5 +1,4 @@
-function leaveRoom(){
-    var room = JSON.parse(document.getElementById('room-name').textContent);
+function leaveRoom(room){
     const csrftoken = (document.cookie).toString().split("=")[1];
     $.ajax({
         url: '/leave_room/',
@@ -75,6 +74,41 @@ function joinRoom(){
                 $('#message').delay(5000).fadeOut('slow');
                }
            }
+        },
+        error: function(data){
+            console.log(data)
+        }
+    })
+}
+
+function changeRoomType(){
+    var room_name = $('#room-name').text();
+    console.log(room_name)
+    const csrftoken = (document.cookie).toString().split("=")[1];
+    var is_private = $("#room-type-private").is(':checked');
+    var is_public = $("#room-type-public").is(':checked');
+    $.ajax({
+        url: '/change_room_type/',
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        type: 'POST',
+        data: JSON.stringify({
+            'room_name': room_name,
+            'is_public': is_public,
+            'is_private': is_private,
+        }),
+        success: function(data){
+            if(data['status'] == true ){
+                window.location.reload();
+            }
+            else if(data['status'] == false){
+                console.log(data)
+                $('#Modal').modal('hide');
+                $('#message').removeClass('d-none');
+                $('#message').append("<h5>"+ data['error'] +".!</h5>")
+                $('#message').delay(5000).fadeOut('slow');
+            }
         },
         error: function(data){
             console.log(data)

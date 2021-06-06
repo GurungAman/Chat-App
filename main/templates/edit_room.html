@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %} Edit Room {% endblock title %}
+
+{% block body %}
+
+<div class="container mt-5">
+  <div id="message" class="alert alert-warning alert-dismissible fade show text-center d-none" role="alert">
+  </div>
+  <div class='d-flex justify-content-center'>
+    <h1 class="text-center">Edit {{room}}.</h1>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-6">
+      <form>
+
+        <div class="form-group row">
+          <label for="room-name" class="col-3 col-form-label">Room name</label>
+          <div class="col-8">
+            <span class="form-control-plaintext" id="room-name">{{room}}</span>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="total-users" class="col-3 col-form-label">Total users</label>
+          <div class="col-8">
+            <span class="form-control-plaintext">{{approved_user|length}}</span>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="total-users" class="col-3 col-form-label">Room Type</label>
+          <div class="col-5">
+            <span class='form-control-plaintext d-flex align-items-center justify-content-between'> 
+              {% if room.is_public %}
+              Public
+              {% elif  room.is_private %}
+              Private
+              {% endif %}
+               <!-- Button trigger modal -->
+                <button type="button" data-toggle="modal" data-target="#Modal">
+                  <span class="fa fa-edit">Edit</span>
+                </button>
+              </span>
+            
+          </div>
+        </div>
+
+        <div class="form-group row justify-content-between mt-2">
+          <div class="col">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showAllUsers">
+              Show all users
+            </button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showPendingRequests">
+              Show pending requests
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+
+{% include 'edit-room-modal.html' %}
+{% include 'show-all-users-modal.html' %}
+{% include 'pending-request-modal.html' %}
+
+
+<script>
+  var is_private = '{{room.is_private}}'.toLowerCase();
+  var is_public = '{{room.is_public}}'.toLowerCase();
+  if(is_public == 'true'){
+    document.getElementById("room-type-private").checked = true;
+  }
+  else if(is_private == 'true'){
+    document.getElementById("room-type-public").checked = true;
+  }
+</script>
+{% endblock body %}

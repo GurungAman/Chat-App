@@ -1,0 +1,41 @@
+<!-- Show user modal -->
+<div class="modal fade" id="showPendingRequests" tabindex="-1" role="dialog" aria-labelledby="showPendingRequestsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <h5 class="modal-title" id="ModalLongTitle">All users:</h5>
+        </div>
+
+        <div class="modal-body d-flex align-items-center justify-content-around">
+            {% if not pending_requests %}
+            <span>
+                No incoming requests.
+            </span>
+
+            {% elif pending_requests %}
+                {% for user in pending_requests %}
+                    <div class="col-6 d-flex justify-content-center">
+                      <span>
+                        {{user}}
+                    </span> 
+                    </div>
+                    <div class="col-6 d-flex justify-content-center">
+                      <button type="button" class="btn btn-outline-success mx-1" onclick="">
+                        Accept
+                      </button>
+                      <button type="button" class="btn btn-outline-danger mx-1" onclick="">
+                        Remove
+                      </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="">Accept All</button>
+
+        </div>
+      </div>
+    </div>
+  </div>

@@ -8,6 +8,7 @@
 <div class="container mt-5"> 
     <div id="message" class="alert alert-warning alert-dismissible fade show text-center d-none" role="alert">
     </div>
+    
     <h1 class="text-center">Welcome {{request.user}}.!</h1>
     <div class="row">
         <div class="col-12 text-center">
@@ -40,7 +41,7 @@
                             <input class="mt-2" type="radio" name="flexRadioDefault" id="is_public" checked>
                               Public chat room
                           </div>
-                          <div class="form-check">
+                          <div class="form-check text-center">
                             <input class="mt-2" type="radio" name="flexRadioDefault" id="is_private">
                               Private Chat room
                           </div>
@@ -60,14 +61,34 @@
         <div class="col-md-6 col-sm-12">
             <h3 class='text-center'> Rooms you have created.</h3>
             {% for room in rooms_created %}
-            <div class='text-center'><a href="{% url 'chat_room' room_name=room %}">{{room}}</a></div>
+            <div class='text-center'>
+                <div class="dropdown my-2">
+                    <button class="btn dropdown-toggle" type="" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {{room}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="{% url 'chat_room' room_name=room %}">Join Room</a>
+                      <a class="dropdown-item" href="{% url 'edit_room' room_name=room %}">Edit Room</a>
+                    </div>
+                  </div>
+            </div>
             {% endfor %}
         </div>
     
         <div class="col-md-6 col-sm-12">
             <h3 class='text-center'>Rooms you have joined.</h3>
             {% for room in rooms_joined %}
-            <div class='text-center'><a href="{% url 'chat_room' room_name=room %}">{{room}}</a></div>
+            <div class='text-center'>
+                <div class="dropdown my-2">
+                    <button class="btn dropdown-toggle" type="" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {{room}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="{% url 'chat_room' room_name=room %}">Join Room</a>
+                      <a class="dropdown-item" onclick="leaveRoom('{{room}}')">Leave Room</a>
+                    </div>
+                  </div>
+            </div>
             {% endfor %}
         </div>
     </div>

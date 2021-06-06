@@ -17,13 +17,18 @@ def is_public_room(room_name):
     else:
         return False
 
-def approve_pending_requests(room_name, users):
+def accept_pending_requests(request):
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    user = request.user
     room = Room.objects.get(room=room_name)
     pending_users = room.get_pending_requests()
     for user in users:
         if user in pending_users:
             room.pending_requests.remove(user)
             room.approved_users.add(user)
+    return None
+
 
 
 def create_chat_room(request):
@@ -66,6 +71,60 @@ def join_chat_room(request):
         response_json['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response_json)
 
+
+def leave_room(request):
+    response = {'status': False}
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    room_name = data_json['room']
+    current_user = request.user
+    try:
+        room = Room.objects.get(room=room_name)
+        user_admin = room.user_admin
+        if user_admin is not current_user:
+            room.approved_users.remove(current_user)
+        else:
+            response['user_admin'] = True
+        response['status'] = True
+        return JsonResponse(response)
+    except Exception as e:
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+def edit_room(request, room_name):
+    room = Room.objects.get(room=room_name)
+    pending_requests = room.get_pending_requests()
+    approved_users = room.get_approved_users()
+    approved_user = []
+    user_admin = request.user
+    for user in approved_users:
+        if user !=  user_admin:
+            approved_user.append(user)
+    print(approved_user)
+    return render(request,
+                template_name = "edit_room.html", 
+                context = {'room': room,
+                            'pending_requests': pending_requests,
+                            'approved_user': approved_user})
+
+def change_room_type(request):
+    response = {'status': False}
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        room.is_public = data_json['is_public']
+        room.is_private = data_json['is_private']
+        room.save()
+        messages.info(request, "Room type successfully changed.!")
+        response['status'] = True
+        return JsonResponse(response)
+    except Exception as e:
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
 @login_required(login_url='login')
 def index(request):
     rooms_created = Room.objects.filter(user_admin = request.user)
@@ -73,7 +132,7 @@ def index(request):
     all_rooms_joined = user.approved_users.all()
     rooms_joined = []
     for room in all_rooms_joined:
-        if not room in rooms_created:
+        if room not in rooms_created:
             rooms_joined.append(room)
     return render(request,
                 template_name = 'index.html',
@@ -96,23 +155,6 @@ def chat_room(request, room_name):
                         'message': message
                         })
 
-def leave_room(request):
-    response = {'status': False}
-    json_str = request.body.decode(encoding='UTF-8')
-    data_json = json.loads(json_str)
-    room_name = data_json['room']
-    current_user = request.user
-    try:
-        room = Room.objects.get(room=room_name)
-        user_admin = room.user_admin
-        if user_admin != current_user:
-            room.approved_users.remove(current_user)
-        else:
-            response['user_admin'] = True
-        response['status'] = True
-    except Exception as e:
-        response['error'] = f'{e.__class__.__name__}'
-    return JsonResponse(response)
 
 
 def user_login(request):
