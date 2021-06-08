@@ -6,7 +6,7 @@
           <h5 class="modal-title" id="ModalLongTitle">All users:</h5>
         </div>
 
-        <div class="modal-body d-flex align-items-center justify-content-around">
+        <div class="modal-body">
             {% if not pending_requests %}
             <span>
                 No incoming requests.
@@ -14,27 +14,32 @@
 
             {% elif pending_requests %}
                 {% for user in pending_requests %}
-                    <div class="col-6 d-flex justify-content-center">
-                      <span>
-                        {{user}}
-                    </span> 
-                    </div>
-                    <div class="col-6 d-flex justify-content-center">
-                      <button type="button" class="btn btn-outline-success mx-1" onclick="">
-                        Accept
-                      </button>
-                      <button type="button" class="btn btn-outline-danger mx-1" onclick="">
-                        Remove
-                      </button>
-                    </div>
+                <div class="row my-1" id="{{user}}_pending">
+
+                  <div class="col text-center">
+                    <span>
+                      {{user}}
+                  </span> 
+                  </div>
+
+                  <div class="col text-center">
+                    <button type="button" class="btn btn-outline-success mx-1" onclick="acceptPendingRequests('{{user}}')">
+                      Accept
+                    </button>
+                    <button type="button" class="btn btn-outline-danger mx-1" onclick="rejectIncomingRequests('{{user}}')">
+                      Remove
+                    </button>
+                  </div>
+                </div>
                 {% endfor %}
             {% endif %}
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="">Accept All</button>
-
+          {% if pending_requests %}
+            <button type="button"  class="btn btn-primary" onclick="acceptPendingRequests()">Accept All</button>
+          {% endif %}
         </div>
       </div>
     </div>

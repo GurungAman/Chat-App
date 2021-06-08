@@ -1,36 +1,81 @@
 from django.core.checks import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from main.models import Room, Message
+from main.models import Room
 import json
 
 
 # Create your views here.
-def is_public_room(room_name):
-    room = Room.objects.get(room=room_name)
-    if room.is_public:
-        return True
-    else:
-        return False
-
-def accept_pending_requests(request):
+def check_user(request):
+    response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
     data_json = json.loads(json_str)
-    user = request.user
-    room = Room.objects.get(room=room_name)
-    pending_users = room.get_pending_requests()
-    for user in users:
-        if user in pending_users:
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        user = request.user
+        print(user)
+        if room.user_admin is not user:
+             response['is_user_admin'] = False
+        else:
+            response['is_user_admin'] = True
+        response['status'] = True
+        messages.info(request, "Permission Denied")
+        return JsonResponse(response)
+    except Exception as e:
+        messages.info(request, "Something went wrong")
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+@login_required(login_url='login')
+def accept_pending_requests(request):
+    response = {'status': False}
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        if data_json['accept_all']:
+            print("accpet all")
+            pending_request = room.get_pending_requests()
+            for user in pending_request:
+                room.approved_users.add(user)
+                room.pending_requests.remove(user)
+                messages.info(request, "All requests accepted.")
+        else:
+            print(f"Accept {data_json['user']} request")
+            user =  User.objects.get(username=data_json['user'])
             room.pending_requests.remove(user)
             room.approved_users.add(user)
-    return None
+        response['status'] = True
+        return JsonResponse(response)
+    except Exception as e:
+        messages.info(request, "Something went wrong")
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+@login_required(login_url='login')
+def reject_incoming_request(request):
+    response = {'status': False}
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        pending_requests = room.get_pending_requests()
+        user = User.objects.get(username=data_json['user'])
+        room.pending_requests.remove(user)
+        response['status'] = True
+        return JsonResponse(response)
+    except Exception as e:
+        messages.info(request, "Something went wrong")
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
 
 
-
+@login_required(login_url='login')
 def create_chat_room(request):
     json_str = request.body.decode(encoding='UTF-8')
     data_json = json.loads(json_str)
@@ -51,6 +96,8 @@ def create_chat_room(request):
         response_json['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response_json)
 
+
+@login_required(login_url='login')
 def join_chat_room(request):
     response_json = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
@@ -72,6 +119,7 @@ def join_chat_room(request):
         return JsonResponse(response_json)
 
 
+@login_required(login_url='login')
 def leave_room(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
@@ -92,6 +140,7 @@ def leave_room(request):
         return JsonResponse(response)
 
 
+@login_required(login_url='login')
 def edit_room(request, room_name):
     room = Room.objects.get(room=room_name)
     pending_requests = room.get_pending_requests()
@@ -101,13 +150,14 @@ def edit_room(request, room_name):
     for user in approved_users:
         if user !=  user_admin:
             approved_user.append(user)
-    print(approved_user)
     return render(request,
                 template_name = "edit_room.html", 
                 context = {'room': room,
                             'pending_requests': pending_requests,
                             'approved_user': approved_user})
 
+
+@login_required(login_url='login')
 def change_room_type(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
@@ -121,6 +171,23 @@ def change_room_type(request):
         response['status'] = True
         return JsonResponse(response)
     except Exception as e:
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+@login_required(login_url='login')
+def remove_from_chat_room(request):
+    response ={"status": False}
+    json_str = request.body.decode(encoding="UTF-8")
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        user = User.objects.get(username=data_json['user'])
+        room.approved_users.remove(user)
+        response['status'] = True
+        return JsonResponse(response)    
+    except Exception as e:
+        messages.info(request, "An Error Occured")
         response['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response)
 
@@ -144,9 +211,13 @@ def index(request):
 def chat_room(request, room_name):
     try:
         room = Room.objects.get(room=room_name)
-        user = request.user
         message = reversed(room.message_set.order_by('-timestamp')[:15])
-    except Exception as e:
+        user = request.user
+        approved_users = room.get_approved_users()
+        if user not in approved_users:
+            messages.info(request, "Not allowed")
+            return redirect("homepage")
+    except:
         messages.info(request, "Room Does not exist!")
         return redirect('homepage')
     return render(request,
@@ -154,7 +225,6 @@ def chat_room(request, room_name):
             context = {'room_name': room_name,
                         'message': message
                         })
-
 
 
 def user_login(request):
@@ -170,3 +240,9 @@ def user_login(request):
                     template_name="log_in.html",
                     context={"error_message": "Invalid credentials.!"})
     return render(request, template_name="log_in.html")
+
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, "Logged out successfully.!")
+    return redirect("login")

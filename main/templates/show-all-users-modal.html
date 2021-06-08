@@ -6,20 +6,27 @@
           <h5 class="modal-title" id="ModalLongTitle">All users:</h5>
         </div>
 
-        <div class="modal-body d-flex align-items-center justify-content-around">
+        <div class="modal-body">
             {% if not approved_user %}
             <span>
               Empty chat-room.
             </span>
             {% elif approved_user %}
                 {% for user in approved_user %}
-                    <span>
-                        {{user}}
-                    </span> 
+                    <div class="row my-1" id="{{user}}">
 
-                    <button type="button" class="btn btn-outline-danger" onclick="">
-                      Remove
-                    </button>
+                      <div class="col text-center">
+                        <span>
+                          {{user}}
+                      </span> 
+                      </div>
+
+                      <div class="col text-center">
+                        <button type="button" class="btn btn-outline-danger" onclick="removeUserFromChatRoom('{{user}}')">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
                 {% endfor %}
             {% endif %}
         </div>

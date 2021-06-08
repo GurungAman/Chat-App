@@ -23,7 +23,10 @@ urlpatterns = [
     path('join_chat_room/', views.join_chat_room, name='join_chat_room'),
     path('edit_room/<slug:room_name>', views.edit_room, name='edit_room'),
     path('change_room_type/', views.change_room_type, name='change_room_type'),
+    path('remove_from_chat/', views.remove_from_chat_room, name='remove_from_chat_room'),
+    path('check_user/', views.check_user, name='check_user'),
     path('accept_pending_request/', views.accept_pending_requests, name='accept_pending_requests'),
+    path('reject_incoming_request/', views.reject_incoming_request, name='reject_incoming_request'),
     path('chat/<slug:room_name>/', views.chat_room, name='chat_room'),
     path('leave_room/', views.leave_room, name='leave_room'),
 ]

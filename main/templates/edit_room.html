@@ -3,6 +3,7 @@
 {% block title %} Edit Room {% endblock title %}
 
 {% block body %}
+{% load static %}
 
 <div class="container mt-5">
   <div id="message" class="alert alert-warning alert-dismissible fade show text-center d-none" role="alert">
@@ -50,12 +51,12 @@
         <div class="form-group row justify-content-between mt-2">
           <div class="col">
             <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showAllUsers">
-              Show all users
+              All users ({{approved_user|length}})
             </button>
           </div>
           <div class="col">
             <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showPendingRequests">
-              Show pending requests
+              Pending requests ({{pending_requests|length}})
             </button>
           </div>
         </div>
@@ -80,4 +81,11 @@
     document.getElementById("room-type-public").checked = true;
   }
 </script>
+<script src="{% static 'js/check_user.js' %}"></script>
+<script>
+  window.onload = function(){
+    check_user();
+  }
+</script>
+
 {% endblock body %}

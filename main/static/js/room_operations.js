@@ -115,3 +115,100 @@ function changeRoomType(){
         }
     })
 }
+
+function removeUserFromChatRoom(user){
+    var room_name = $('#room-name').text();
+    const csrftoken = (document.cookie).toString().split("=")[1];
+    $.ajax({
+        url: "/remove_from_chat/",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        type: 'POST',
+        data: JSON.stringify({
+            "room_name": room_name,
+            "user": user
+        }),
+        success: function(data){
+            if (data['status'] == true){
+                $('#'+user).delay(200).fadeOut('fast', function(){
+                    $(this).remove();
+                 });
+            }
+            else if (data['status'] == false){
+                window.location.reload();
+            }
+        },
+        error: function(data){
+            console.log(data)
+        }
+    })
+}
+
+function acceptPendingRequests(user){
+    const csrftoken = (document.cookie).toString().split("=")[1];
+    var room_name = $('#room-name').text();
+    var accept_all = false
+    if (typeof user ==="undefined"){
+        accept_all = true
+    }
+    $.ajax({
+        url: "/accept_pending_request/",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        type: 'POST',
+        data: JSON.stringify({
+            "user": user,
+            "room_name": room_name,
+            "accept_all": accept_all,
+        }),
+        success: function(data){
+            if(data['status']==true){
+                if (accept_all == true){
+                    window.location.reload()
+                }
+                else {
+                    $('#'+user+"_pending").delay(200).fadeOut('fast', function(){
+                        $(this).remove();
+                     });    
+                }
+            }
+            else if(data['status']==false){
+                window.location.reload();
+            }
+        }
+
+    })
+}
+
+
+function rejectIncomingRequests(user){
+    const csrftoken = (document.cookie).toString().split("=")[1];
+    var room_name = $('#room-name').text();
+    $.ajax({
+        url: "/reject_incoming_request/",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        type: 'POST',
+        data: JSON.stringify({
+            "user": user,
+            "room_name": room_name,
+        }),
+        success: function(data){
+            if (data['status'] == true){
+                $('#'+user+"_pending").delay(200).fadeOut('fast', function(){
+                    $(this).remove();
+                 });  
+            } 
+            else if(data['status'] == false){
+                window.location.reload();
+            }
+        },
+        error: function(data){
+            console.log(data)
+        }
+    })
+}
+
