@@ -75,16 +75,10 @@
   var is_private = '{{room.is_private}}'.toLowerCase();
   var is_public = '{{room.is_public}}'.toLowerCase();
   if(is_public == 'true'){
-    document.getElementById("room-type-private").checked = true;
-  }
-  else if(is_private == 'true'){
     document.getElementById("room-type-public").checked = true;
   }
-</script>
-<script src="{% static 'js/check_user.js' %}"></script>
-<script>
-  window.onload = function(){
-    check_user();
+  else if(is_private == 'true'){
+    document.getElementById("room-type-private").checked = true;
   }
 </script>
 

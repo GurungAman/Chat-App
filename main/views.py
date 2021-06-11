@@ -7,31 +7,27 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from main.models import Room
 import json
+from .permission_decorator import check_permission
 
 
 # Create your views here.
-def check_user(request):
-    response = {'status': False}
-    json_str = request.body.decode(encoding='UTF-8')
-    data_json = json.loads(json_str)
-    try:
-        room = Room.objects.get(room=data_json['room_name'])
-        user = request.user
-        print(user)
-        if room.user_admin is not user:
-             response['is_user_admin'] = False
-        else:
-            response['is_user_admin'] = True
-        response['status'] = True
-        messages.info(request, "Permission Denied")
-        return JsonResponse(response)
-    except Exception as e:
-        messages.info(request, "Something went wrong")
-        response['error'] = f'{e.__class__.__name__}'
-        return JsonResponse(response)
+@login_required(login_url='login')
+def index(request):
+    rooms_created = Room.objects.filter(user_admin = request.user)
+    user = User.objects.get(username = request.user.username)
+    all_rooms_joined = user.approved_users.all()
+    rooms_joined = []
+    for room in all_rooms_joined:
+        if room not in rooms_created:
+            rooms_joined.append(room)
+    return render(request,
+                template_name = 'index.html',
+                context={'rooms_created': rooms_created,
+                        'rooms_joined': rooms_joined})
 
 
 @login_required(login_url='login')
+@check_permission
 def accept_pending_requests(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
@@ -58,6 +54,7 @@ def accept_pending_requests(request):
         return JsonResponse(response)
 
 @login_required(login_url='login')
+@check_permission
 def reject_incoming_request(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
@@ -71,6 +68,61 @@ def reject_incoming_request(request):
         return JsonResponse(response)
     except Exception as e:
         messages.info(request, "Something went wrong")
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+@login_required(login_url='login')
+@check_permission
+def edit_room(request, room_name):
+    room = Room.objects.get(room=room_name)
+    pending_requests = room.get_pending_requests()
+    approved_users = room.get_approved_users()
+    approved_user = []    
+    for user in approved_users:
+        if user !=  request.user:
+            approved_user.append(user)
+    return render(request,
+                template_name = "edit_room.html", 
+                context = {'room': room,
+                            'pending_requests': pending_requests,
+                            'approved_user': approved_user})
+
+
+@login_required(login_url='login')
+@check_permission
+def change_room_type(request):
+    response = {'status': False}
+    json_str = request.body.decode(encoding='UTF-8')
+    data_json = json.loads(json_str)
+    print("tes123")
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        room.is_public = data_json['is_public']
+        room.is_private = data_json['is_private']
+        room.save()
+        messages.info(request, "Room type successfully changed.!")
+        response['status'] = True
+        return JsonResponse(response)
+    except Exception as e:
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+@login_required(login_url='login')
+@check_permission
+def remove_from_chat_room(request):
+    response ={"status": False}
+    json_str = request.body.decode(encoding="UTF-8")
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        user = User.objects.get(username=data_json['user'])
+        room.approved_users.remove(user)
+        response['status'] = True
+        return JsonResponse(response)    
+    except Exception as e:
+        messages.info(request, "An Error Occured")
         response['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response)
 
@@ -138,73 +190,6 @@ def leave_room(request):
     except Exception as e:
         response['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response)
-
-
-@login_required(login_url='login')
-def edit_room(request, room_name):
-    room = Room.objects.get(room=room_name)
-    pending_requests = room.get_pending_requests()
-    approved_users = room.get_approved_users()
-    approved_user = []
-    user_admin = request.user
-    for user in approved_users:
-        if user !=  user_admin:
-            approved_user.append(user)
-    return render(request,
-                template_name = "edit_room.html", 
-                context = {'room': room,
-                            'pending_requests': pending_requests,
-                            'approved_user': approved_user})
-
-
-@login_required(login_url='login')
-def change_room_type(request):
-    response = {'status': False}
-    json_str = request.body.decode(encoding='UTF-8')
-    data_json = json.loads(json_str)
-    try:
-        room = Room.objects.get(room=data_json['room_name'])
-        room.is_public = data_json['is_public']
-        room.is_private = data_json['is_private']
-        room.save()
-        messages.info(request, "Room type successfully changed.!")
-        response['status'] = True
-        return JsonResponse(response)
-    except Exception as e:
-        response['error'] = f'{e.__class__.__name__}'
-        return JsonResponse(response)
-
-
-@login_required(login_url='login')
-def remove_from_chat_room(request):
-    response ={"status": False}
-    json_str = request.body.decode(encoding="UTF-8")
-    data_json = json.loads(json_str)
-    try:
-        room = Room.objects.get(room=data_json['room_name'])
-        user = User.objects.get(username=data_json['user'])
-        room.approved_users.remove(user)
-        response['status'] = True
-        return JsonResponse(response)    
-    except Exception as e:
-        messages.info(request, "An Error Occured")
-        response['error'] = f'{e.__class__.__name__}'
-        return JsonResponse(response)
-
-
-@login_required(login_url='login')
-def index(request):
-    rooms_created = Room.objects.filter(user_admin = request.user)
-    user = User.objects.get(username = request.user.username)
-    all_rooms_joined = user.approved_users.all()
-    rooms_joined = []
-    for room in all_rooms_joined:
-        if room not in rooms_created:
-            rooms_joined.append(room)
-    return render(request,
-                template_name = 'index.html',
-                context={'rooms_created': rooms_created,
-                        'rooms_joined': rooms_joined})
 
 
 @login_required(login_url='login')
