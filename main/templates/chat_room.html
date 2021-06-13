@@ -3,18 +3,22 @@
 {% block title %} Chat Room {% endblock title %}
 
 {% block body %}
-<div class="container">
-    <div>
-        <textarea id="chat-log" cols="100" rows="20" readonly>
-            {% for msg in message %}
-            {{ msg.user}}:        {{ msg.content }}
-            {% endfor %}
-        </textarea>
-        <input id="chat-message-input" type="text" size="100">
+<div class="container mt-5">
+
+    <div id="chat-log"  style="height: 400px; width:950px; overflow-y: scroll; overflow-x:hidden;" class="border border-dark px-3 py-3">
+        {% for msg in message %}
+        <div class="row mt-2">
+            <div class="col-1">{{ msg.user}}:</div>
+            <div class="col-10 px-5">{{ msg.content }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-1">
+        <input id="chat-message-input" type="text" size="90"  class="border border-dark">
     </div>
 
     <button type="button" id="chat-message-submit" class="btn btn-dark mt-1">Send</button>
-
 
     {{ room_name|json_script:"room-name" }}
     
@@ -34,9 +38,23 @@
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        //document.querySelector('#chat-log').value += (data.user + ': ' + data.message + '\n \n');
+
         const chat_log = document.getElementById('chat-log');
-        chat_log.value += ('\t' + data.user + ':\t' + data.message + '\n \n');
+        let row = document.createElement('div');
+        row.classList.add("row", "mt-2")
+
+        let col_user = document.createElement('div');
+        col_user.classList.add("col-1")
+        col_user.innerHTML = data.user
+
+        let col_msg = document.createElement('div');
+        col_msg.classList.add("col-10", "px-5")
+        col_msg.innerHTML  = data.message
+        
+        row.appendChild(col_user)
+        row.appendChild(col_msg)
+
+        chat_log.append(row)
         chat_log.scrollTop = chat_log.scrollHeight
     };
 

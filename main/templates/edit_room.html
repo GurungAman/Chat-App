@@ -9,7 +9,7 @@
   <div id="message" class="alert alert-warning alert-dismissible fade show text-center d-none" role="alert">
   </div>
   <div class='d-flex justify-content-center'>
-    <h1 class="text-center">Edit {{room}}.</h1>
+    <h1 class="mx-auto">Edit {{room}}.</h1>
   </div>
 
   <div class="row justify-content-center">
@@ -49,16 +49,21 @@
         </div>
 
         <div class="form-group row justify-content-between mt-2">
-          <div class="col">
+          <div class="col-sm-12 col-md-3">
             <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showAllUsers">
               All users ({{approved_user|length}})
             </button>
           </div>
-          <div class="col">
+          <div class="col-md-5 col-sm-12">
             <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showPendingRequests">
               Pending requests ({{pending_requests|length}})
             </button>
           </div>
+          <!-- <div class="col-md-4 col-sm-12">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#showPendingRequests">
+              Add users
+            </button>
+          </div> -->
         </div>
 
       </form>

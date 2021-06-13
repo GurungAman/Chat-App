@@ -10,7 +10,7 @@ function leaveRoom(room){
             'room': room,
         }),
         success: function(data){
-            window.location.href = 'http://127.0.0.1:8000/'
+            window.location.href = '/'
         },
         error: function(data){
             console.log(data)
@@ -64,15 +64,18 @@ function joinRoom(){
             'room_name': room_name,
         }),
         success: function(data){
+            console.log(data)
            if(data['status']==true){
                if(data['public_room']==true){
                    window.location.href = '/chat/' + room_name
                }
                else if(data['private_room']==true){
-                $('#message').removeClass('d-none');
-                $('#message').append("<h5>Your request to join room "+ room_name +" is on hold.!</h5>")
-                $('#message').delay(5000).fadeOut('slow');
+                   window.location.reload();
+                
                }
+           }
+           else if (data['status'] == false){
+            window.location.reload();
            }
         },
         error: function(data){
