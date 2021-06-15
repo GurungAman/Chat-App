@@ -28,4 +28,6 @@ urlpatterns = [
     path('reject_incoming_request/', views.reject_incoming_request, name='reject_incoming_request'),
     path('chat/<slug:room_name>/', views.chat_room, name='chat_room'),
     path('leave_room/', views.leave_room, name='leave_room'),
+
+    path('get_messages/', views.get_messages, name='get_messages'),
 ]

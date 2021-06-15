@@ -6,12 +6,7 @@
 <div class="container mt-5">
 
     <div id="chat-log"  style="height: 400px; width:950px; overflow-y: scroll; overflow-x:hidden;" class="border border-dark px-3 py-3">
-        {% for msg in message %}
-        <div class="row mt-2">
-            <div class="col-1">{{ msg.user}}:</div>
-            <div class="col-10 px-5">{{ msg.content }}</div>
-        </div>
-        {% endfor %}
+        
     </div>
 
     <div class="mt-1">
@@ -38,24 +33,10 @@
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-
         const chat_log = document.getElementById('chat-log');
-        let row = document.createElement('div');
-        row.classList.add("row", "mt-2")
 
-        let col_user = document.createElement('div');
-        col_user.classList.add("col-1")
-        col_user.innerHTML = data.user
-
-        let col_msg = document.createElement('div');
-        col_msg.classList.add("col-10", "px-5")
-        col_msg.innerHTML  = data.message
-        
-        row.appendChild(col_user)
-        row.appendChild(col_msg)
-
-        chat_log.append(row)
-        chat_log.scrollTop = chat_log.scrollHeight
+        addToDom(data);
+        //chat_log.scrollTop = chat_log.scrollHeight
     };
 
     chatSocket.onclose = function(e) {
@@ -85,4 +66,10 @@
     };
 </script>
 
+<script>
+    window.onload = (event) => {
+        var page_number = 1
+        loadMessages(page_number);
+      };
+</script>
 {% endblock body %}

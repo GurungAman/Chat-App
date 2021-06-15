@@ -1,5 +1,6 @@
+from django.contrib.auth import models
 from django.core.checks import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, response
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,7 +9,7 @@ from django.contrib import messages
 from main.models import Room
 import json
 from .permission_decorator import check_permission
-
+from django.core.paginator import Paginator
 
 # Create your views here.
 @login_required(login_url='login')
@@ -53,6 +54,7 @@ def accept_pending_requests(request):
         response['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response)
 
+
 @login_required(login_url='login')
 @check_permission
 def reject_incoming_request(request):
@@ -61,7 +63,6 @@ def reject_incoming_request(request):
     data_json = json.loads(json_str)
     try:
         room = Room.objects.get(room=data_json['room_name'])
-        pending_requests = room.get_pending_requests()
         user = User.objects.get(username=data_json['user'])
         room.pending_requests.remove(user)
         response['status'] = True
@@ -95,7 +96,6 @@ def change_room_type(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
     data_json = json.loads(json_str)
-    print("tes123")
     try:
         room = Room.objects.get(room=data_json['room_name'])
         room.is_public = data_json['is_public']
@@ -161,10 +161,12 @@ def join_chat_room(request):
         if room.is_public:
             room.approved_users.add(user)
             response_json['public_room'] = True
+            messages.info(request, f"Welcome to {room}")
             return JsonResponse(response_json)
         elif room.is_private:
             room.pending_requests.add(user)
             response_json['private_room'] = True
+            messages.info(request, f"Your request to join room {room} is on hold.!")
             return JsonResponse(response_json)
     except Exception as e:
         response_json['error'] = f'{e.__class__.__name__}'
@@ -176,7 +178,7 @@ def leave_room(request):
     response = {'status': False}
     json_str = request.body.decode(encoding='UTF-8')
     data_json = json.loads(json_str)
-    room_name = data_json['room']
+    room_name = data_json['room_name']
     current_user = request.user
     try:
         room = Room.objects.get(room=room_name)
@@ -194,22 +196,43 @@ def leave_room(request):
 
 @login_required(login_url='login')
 def chat_room(request, room_name):
-    try:
-        room = Room.objects.get(room=room_name)
-        message = reversed(room.message_set.order_by('-timestamp')[:15])
-        user = request.user
-        approved_users = room.get_approved_users()
-        if user not in approved_users:
-            messages.info(request, "Not allowed")
-            return redirect("homepage")
-    except:
-        messages.info(request, "Room Does not exist!")
-        return redirect('homepage')
     return render(request,
             template_name = 'chat_room.html',
-            context = {'room_name': room_name,
-                        'message': message
-                        })
+            context = {'room_name': room_name})
+
+
+@login_required(login_url='login')
+def get_messages(request):
+    try:
+        response = {'status': False}
+        json_str = request.body.decode(encoding='UTF-8')
+        data_json = json.loads(json_str)
+        room = Room.objects.get(room=data_json['room_name'])
+        approved_users = room.get_approved_users()
+        user = request.user
+        if room.is_private and user not in approved_users:
+            messages.info(request, "Not allowed")
+            return redirect("homepage")
+        else:
+            message_list = room.message_set.order_by('-timestamp')
+            paginator = Paginator(message_list, 12)
+            page_obj = paginator.page(data_json['page_number'])
+
+            response['data'] = []
+            for data in page_obj.object_list:
+                response['data'].append({
+                    'user': data.user.username,
+                    'message': data.content,
+                    'timestamp': data.timestamp
+                })
+            response['status'] = True
+
+            return JsonResponse(response)
+    except Exception as e:
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+    
 
 
 def user_login(request):

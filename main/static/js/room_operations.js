@@ -7,7 +7,7 @@ function leaveRoom(room){
         },
         type: 'POST',
         data: JSON.stringify({
-            'room': room,
+            'room_name': room,
         }),
         success: function(data){
             window.location.href = '/'
@@ -85,6 +85,7 @@ function joinRoom(){
 }
 
 function changeRoomType(){
+    // console.log($('#Modal').is(':visible'))
     var room_name = $('#room-name').text();
     console.log(room_name)
     const csrftoken = (document.cookie).toString().split("=")[1];
