@@ -1,4 +1,4 @@
-function addToDom(data){
+function addToDom(data, prepend=true){
     const chat_log = document.getElementById('chat-log');
 
     let row = document.createElement('div');
@@ -15,9 +15,14 @@ function addToDom(data){
     row.appendChild(col_user)
     row.appendChild(col_msg)
 
-    chat_log.prepend(row)
+    if(prepend==true){
+        chat_log.prepend(row)
+    }
+    else if(prepend==false){
+        chat_log.append(row)
+    }
+   chat_log.scrollTop = 300
 
-    
 }
 
 
@@ -29,11 +34,9 @@ function loadMessages(page_number){
         var scrollTop = $(this).scrollTop();
 
         if (scrollTop == 0) {
-
             page_number++;
             getMessages(page_number)
-            console.log(page_number +" here")
-            }
+        }
         });
 
 }

@@ -215,7 +215,7 @@ def get_messages(request):
             return redirect("homepage")
         else:
             message_list = room.message_set.order_by('-timestamp')
-            paginator = Paginator(message_list, 12)
+            paginator = Paginator(message_list, 15)
             page_obj = paginator.page(data_json['page_number'])
 
             response['data'] = []
