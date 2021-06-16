@@ -15,7 +15,7 @@ def check_permission(func):
                 json_str = request.body.decode(encoding='UTF-8')
                 data_json = json.loads(json_str)
                 room = Room.objects.get(room=data_json['room_name'])
-                print(room)
+
 
             user_admin = room.user_admin
             if user != user_admin:

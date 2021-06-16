@@ -1,6 +1,5 @@
-from django.contrib.auth import models
 from django.core.checks import messages
-from django.http import JsonResponse, response
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -128,6 +127,31 @@ def remove_from_chat_room(request):
 
 
 @login_required(login_url='login')
+@check_permission
+def add_user(request):
+    response ={"status": False}
+    json_str = request.body.decode(encoding="UTF-8")
+    data_json = json.loads(json_str)
+    try:
+        room = Room.objects.get(room=data_json['room_name'])
+        user = User.objects.get(username=data_json['username'])
+        
+        if user in room.approved_users.all():
+            messages.info(request, f"{user} is already in this room.!")
+            return JsonResponse(response)
+        room.approved_users.add(user)
+        if user in room.pending_requests.all():
+            room.pending_requests.remove(user)
+        
+        response['status'] = True
+        return JsonResponse(response)    
+    except Exception as e:
+        messages.info(request, f'Error: {e.__class__.__name__}')
+        response['error'] = f'{e.__class__.__name__}'
+        return JsonResponse(response)
+
+
+@login_required(login_url='login')
 def create_chat_room(request):
     json_str = request.body.decode(encoding='UTF-8')
     data_json = json.loads(json_str)
@@ -231,8 +255,6 @@ def get_messages(request):
     except Exception as e:
         response['error'] = f'{e.__class__.__name__}'
         return JsonResponse(response)
-
-    
 
 
 def user_login(request):

@@ -41,8 +41,9 @@ function createRoom(){
             }
             else if (data['status']==false){
                 $('#message').removeClass('d-none');
-                $('#message').append("<h5>Room with name "+ room_name +" already exists.!</h5>")
-                $('#message').delay(5000).fadeOut('slow');
+                $('#message').html("<h5>Room with name "+ room_name +" already exists.!</h5>")
+                $('#message').finish().show().delay(5000).fadeOut('slow');
+                $('#ModalCenter').modal('hide');
             }
         },
         error: function(data){
@@ -85,9 +86,7 @@ function joinRoom(){
 }
 
 function changeRoomType(){
-    // console.log($('#Modal').is(':visible'))
     var room_name = $('#room-name').text();
-    console.log(room_name)
     const csrftoken = (document.cookie).toString().split("=")[1];
     var is_private = $("#room-type-private").is(':checked');
     var is_public = $("#room-type-public").is(':checked');
@@ -110,8 +109,8 @@ function changeRoomType(){
                 console.log(data)
                 $('#Modal').modal('hide');
                 $('#message').removeClass('d-none');
-                $('#message').append("<h5>"+ data['error'] +".!</h5>")
-                $('#message').delay(5000).fadeOut('slow');
+                $('#message').html("<h5>"+ data['error'] +".!</h5>")
+                $('#message').finish().show().delay(5000).fadeOut('slow');
             }
         },
         error: function(data){
@@ -216,3 +215,32 @@ function rejectIncomingRequests(user){
     })
 }
 
+function addUser(){
+    const csrftoken = (document.cookie).toString().split("=")[1];
+    var room_name = $('#room-name').text();
+    var username = $('#username').val();
+    $.ajax({
+        url: "/add_user/",
+        headers: {
+            'X-CSRFToken': csrftoken
+        },
+        type: 'POST',
+        data: JSON.stringify({
+            "room_name": room_name,
+            "username": username
+        }),
+        success: function(data){
+            if (data['status'] == true){
+                $('#message').removeClass('d-none');
+                $('#message').html("<h5>User "+ username +" added.!</h5>")
+                $('#message').finish().show().delay(5000).fadeOut('slow');
+            } 
+            else if(data['status'] == false){
+                window.location.reload();
+            }
+        },
+        error: function(data){
+            console.log(data)
+        }
+    })
+}

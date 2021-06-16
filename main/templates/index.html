@@ -31,7 +31,9 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="ModalTitle">Room Name:  </h5>
+                    <h5 class="modal-title" id="ModalTitle">Room Name:  
+                        <span id="room-name"></span>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -97,7 +99,7 @@
 <script>
     document.querySelector('#create-chat-room').onclick = function(e) {
         const room_name = document.querySelector('#room-name-input').value;
-        $("#ModalTitle").append(room_name)
+        $("#room-name").empty().append(room_name)
           
     };
 </script>

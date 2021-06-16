@@ -1,0 +1,28 @@
+<!-- Show user modal -->
+<div class="modal fade" id="showAddUser" tabindex="-1" role="dialog" aria-labelledby="showPendingRequestsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+          <h5 class="modal-title" id="ModalLongTitle">All users:</h5>
+        </div>
+
+        <div class="modal-body">
+            <form>
+                <div class="form-group row justify-content-center">
+                    <div for="username" class="col-sm-2 col-form-label">Username:</div>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="username" placeholder="Username">
+                    </div>
+                  </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+          <button type="button"  class="btn btn-primary" onclick="addUser()">Add user</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
