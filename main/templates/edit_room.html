@@ -17,34 +17,41 @@
       <form>
 
         <div class="form-group row">
-          <label for="room-name" class="col-3 col-form-label">Room name</label>
-          <div class="col-8">
+          <div class="col-sm-12 col-md-3">
+            <label for="room-name" class="col-form-label">Room name</label>
+          </div>
+          <div class="col-8 m">
             <span class="form-control-plaintext" id="room-name">{{room}}</span>
           </div>
         </div>
 
         <div class="form-group row">
-          <label for="total-users" class="col-3 col-form-label">Total users</label>
+          <div class="col-sm-12 col-md-3">
+            <label for="total-users" class="col-form-label">Total users</label>
+          </div>
           <div class="col-8">
             <span class="form-control-plaintext">{{approved_user|length}}</span>
           </div>
         </div>
 
-        <div class="form-group row">
-          <label for="total-users" class="col-3 col-form-label">Room Type</label>
-          <div class="col-5">
-            <span class='form-control-plaintext d-flex align-items-center justify-content-between'> 
+        <div class="form-group row justify-content-between">
+          <div class='col-sm-12 col-md-3'>
+            <label for="total-users" class="col-form-label">Room Type</label>
+          </div>
+          <div class="col-sm-3 col-md-4">
+            <span class='form-control-plaintext text-left'> 
               {% if room.is_public %}
               Public
               {% elif  room.is_private %}
               Private
               {% endif %}
-               <!-- Button trigger modal -->
-                <button type="button" data-toggle="modal" data-target="#Modal">
-                  <span class="fa fa-edit">Edit</span>
-                </button>
-              </span>
-            
+            </span>
+          </div>
+          <div class="col-sm-3 col-md-4 text-center">
+            <!-- Button trigger modal -->
+            <button type="button" data-toggle="modal" data-target="#Modal">
+              <span class="fa fa-edit">Edit</span>
+            </button>
           </div>
         </div>
 
