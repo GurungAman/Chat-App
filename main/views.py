@@ -3,12 +3,14 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.contrib import messages
 from main.models import Room
 import json
 from .permission_decorator import check_permission
 from django.core.paginator import Paginator
+
+from .forms import RegisterUser
 
 # Create your views here.
 @login_required(login_url='login')
@@ -258,6 +260,8 @@ def get_messages(request):
 
 
 def user_login(request):
+    if request.user is not AnonymousUser:
+        return redirect('homepage')
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -271,6 +275,22 @@ def user_login(request):
                     context={"error_message": "Invalid credentials.!"})
     return render(request, template_name="log_in.html")
 
+def user_register(request):
+    if request.user is not AnonymousUser:
+        return redirect('homepage')
+    form = RegisterUser
+    if request.method == "POST":
+        form = RegisterUser(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect("homepage")
+    return render(request,
+                template_name='register.html', 
+                context = {"form": form})
 
 def logout_view(request):
     logout(request)

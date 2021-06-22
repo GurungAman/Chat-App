@@ -11,10 +11,25 @@
     <title>{% block title %} {% endblock title %}</title>
 </head>
 <body>
+  
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-light bg-light justify-content-between py-3">
+      <div class="container">
+        <a class="navbar-brand font-weight-bold" href="{% url 'homepage' %}">
+          <i class="fa fa-home"></i>&nbsp; <h4 class='d-inline'>Home</h3>
+        </a>
+        <div class="btn btn-outline-secondary my-2 my-sm-0">
+          <a href="{% url 'logout' %}" class='link-dark text-decoration-none'>Logout &nbsp;
+            <i class="fa fa-sign-out" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </nav>
+    {% endif %}
 
     {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-warning alert-dismissible fade show text-center" role="alert">
+    <div class="alert alert-light bg-light alert-dismissible fade show text-center" role="alert">
         {{message}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>

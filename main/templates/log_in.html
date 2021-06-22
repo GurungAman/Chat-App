@@ -24,7 +24,17 @@
         <label for="password" class="sr-only">Password</label>
         <input type="password" name="password" class="form-control" placeholder="Password">
 
-        <button class="btn btn-md btn-primary btn-block mt-1" type="submit">Sign in</button>
+        <div class="mt-2">
+            <button class="btn btn-md btn-primary btn-block" type="submit">
+                Sign in
+            </button>
+        
+            <div class="d-inline">
+                <a href="{% url 'register' %}" class="offset-1 btn btn-outline-primary text-decoration-none">
+                    Register
+                </a>
+            </div>
+        </div>
 
     </form>
 

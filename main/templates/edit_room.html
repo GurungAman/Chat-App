@@ -6,7 +6,7 @@
 {% load static %}
 
 <div class="container mt-5">
-  <div id="message" class="alert alert-warning alert-dismissible fade show text-center d-none" role="alert">
+  <div id="message" class="alert alert-light bg-light alert-dismissible fade show text-center d-none" role="alert">
   </div>
   <div class='d-flex justify-content-center'>
     <h1 class="mx-auto">Edit {{room}}.</h1>
@@ -39,7 +39,7 @@
             <label for="total-users" class="col-form-label">Room Type</label>
           </div>
           <div class="col-sm-3 col-md-4">
-            <span class='form-control-plaintext text-left'> 
+            <span class='form-control-plaintext'> 
               {% if room.is_public %}
               Public
               {% elif  room.is_private %}

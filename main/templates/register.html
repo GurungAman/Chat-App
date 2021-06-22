@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %} Register {% endblock title %}
+
+{% block body %}
+<div class="container bg-light py-5">
+    <h2 class='d-flex justify-content-center'>Sign up</h2>
+
+    <form method="post">
+
+    <div>
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error }}</strong>
+            </div>
+        {% endfor %}
+        
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="row justify-content-center">
+                <div class="col-2 my-1">{{ field.label_tag }}</div>
+                <div class="col-3 my-1">{{ field }}</div>
+
+               <div class="d-flex justify-content-around">
+                {% if form.errors %}
+                {% for error in field.errors %}
+                    <div class="col-6 p-2 text-center alert alert-danger">
+                        {{ error|escape}}
+                    </div>
+                {% endfor %}
+            {% endif %}
+               </div>
+            </div>
+
+        {% endfor %}
+        
+        <div class='row justify-content-center mt-1'>
+            <div class="col-2">
+                <a href="{% url 'login' %}" class='btn btn-outline-primary text-decoration-none'>Login</a>
+            </div>
+            <div class="col-3">
+                <button type="submit" class="btn btn-primary" value='Sign up'>Sign up</button>
+            </div>
+        </div>
+    </div>
+    </form>
+
+</div>
+
+{% endblock body %}
