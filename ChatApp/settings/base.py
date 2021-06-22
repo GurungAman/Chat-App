@@ -15,13 +15,12 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-print(BASE_DIR)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'e36!1q0+a0%q3i!1_&9d%!2z)-35c-3ldzzk515(z93_9h))2x'
-
 
 # Application definition
 
@@ -98,4 +97,4 @@ STATICFILES_DIR = [os.path.join(BASE_DIR, '/static')]
 STATIC_ROOT = BASE_DIR / '/static'
 
 WSGI_APPLICATION = 'ChatApp.wsgi.application'
-ASGI_APPLICATION = 'ChatApp.asgi.application'
+ASGI_APPLICATION = 'ChatApp.routing.application'
