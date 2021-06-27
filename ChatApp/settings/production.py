@@ -11,7 +11,7 @@ DATABASES = {
         'USER': 'amangrg',
         'PASSWORD': 'amangrg123',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -25,10 +25,3 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
-# ASGI_APPLICATION = 'ChatApp.asgi.application'
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels.layers.InMemoryChannelLayer"
-#     }
-# }

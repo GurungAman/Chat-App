@@ -1,6 +1,20 @@
+# FROM python:3.8.5
+# ENV PYTHONBUFFERED=1
+# WORKDIR /project
+# COPY requirements.txt /project/
+# RUN pip install -r requirements.txt
+# COPY . /project/
+
 FROM python:3.8.5
-ENV PYTHONBUFFERED=1
-WORKDIR /project
-COPY requirements.txt /project/
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
+COPY ./requirements.txt /usr/src/app
+RUN apt-get update 
+RUN apt-get install libpq-dev gcc libcairo2 pango1.0-tests python3-dev python3-psycopg2 redis-server nginx -y
+RUN apt-get install postgresql -y
+RUN python3 -m pip install --upgrade pip
 RUN pip install -r requirements.txt
-COPY . /project/
+COPY . /usr/src/app
+# RUN rm /etc/nginx/sites-enabled/*
+# COPY nginx.conf /etc/nginx/sites-enabled/

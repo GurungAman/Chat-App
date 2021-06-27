@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import User
 from django.contrib import messages
 from main.models import Room
 import json
@@ -102,6 +102,10 @@ def change_room_type(request):
         room.is_public = data_json['is_public']
         room.is_private = data_json['is_private']
         room.save()
+        if room.is_public:
+            for user in room.get_pending_requests():
+                room.approved_users.add(user)
+                room.pending_requests.remove(user)
         messages.info(request, "Room type successfully changed.!")
         response['status'] = True
         return JsonResponse(response)
@@ -184,6 +188,9 @@ def join_chat_room(request):
     try:
         room = Room.objects.get(room=data_json['room_name'])
         response_json['status'] = True
+        if request.user in room.approved_users.all():
+            messages.info(request, "You have already joined this room.")
+            return redirect('homepage')
         if room.is_public:
             room.approved_users.add(user)
             response_json['public_room'] = True
@@ -222,9 +229,15 @@ def leave_room(request):
 
 @login_required(login_url='login')
 def chat_room(request, room_name):
+    room = Room.objects.get(room=room_name)
+    from django.conf import settings
+    debug = settings.DEBUG
+    if request.user not in room.approved_users.all() and room.is_private:
+        return redirect('homepage')
     return render(request,
             template_name = 'chat_room.html',
-            context = {'room_name': room_name})
+            context = {'room_name': room_name,
+            'debug': debug})
 
 
 @login_required(login_url='login')
@@ -260,7 +273,7 @@ def get_messages(request):
 
 
 def user_login(request):
-    if request.user is not AnonymousUser:
+    if not request.user.is_anonymous:
         return redirect('homepage')
     if request.method == "POST":
         username = request.POST['username']
@@ -276,7 +289,7 @@ def user_login(request):
     return render(request, template_name="log_in.html")
 
 def user_register(request):
-    if request.user is not AnonymousUser:
+    if not request.user.is_anonymous:
         return redirect('homepage')
     form = RegisterUser
     if request.method == "POST":

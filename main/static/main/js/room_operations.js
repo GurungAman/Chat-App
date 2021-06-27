@@ -76,7 +76,10 @@ function joinRoom(){
                }
            }
            else if (data['status'] == false){
-            window.location.reload();
+                $('#message').removeClass('d-none');
+                $('#message').html("<h5>Room "+ room_name +" does not exist.!</h5>")
+                $('#message').finish().show().delay(5000).fadeOut('slow');
+            // window.location.reload();
            }
         },
         error: function(data){

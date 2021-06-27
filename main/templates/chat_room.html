@@ -26,14 +26,23 @@
 <script>
     
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
-
-    const chatSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/chat/'
-        + roomName
-        + '/'
-    );
+    {% if debug %}
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+    {% else %}
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.hostname
+            + ':8001/ws/chat/'
+            + roomName
+            + '/'
+        );
+    {% endif %}
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);

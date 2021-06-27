@@ -11,6 +11,11 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.developement')
+from django.conf import settings
+
+if settings.DEBUG:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.developement')
+else:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.production')
 
 application = get_wsgi_application()
