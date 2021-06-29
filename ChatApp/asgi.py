@@ -12,12 +12,11 @@ import django
 
 from channels.routing import get_default_application
 from django.core.asgi import get_asgi_application
+from decouple import config
 
-from django.conf import settings
-
-if settings.DEBUG:
+if config('environment') == 'developement':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.developement')
-else:
+elif config('environment') == 'production':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.production')
 
 django.setup()

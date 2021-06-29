@@ -10,12 +10,12 @@ https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from decouple import config
 
-from django.conf import settings
 
-if settings.DEBUG:
+if config('environment') == 'developement':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.developement')
-else:
+elif config('environment') == 'production':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ChatApp.settings.production')
 
 application = get_wsgi_application()
