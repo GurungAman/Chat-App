@@ -173,6 +173,7 @@ def create_chat_room(request):
         room.approved_users.add(user)
         response_json['status'] = True
         messages.info(request, f'Room {room.room} created successfully by {room.user_admin}')
+        response_json['room_name'] = room.room
         return JsonResponse(response_json)
     except Exception as e:
         response_json['error'] = f'{e.__class__.__name__}'

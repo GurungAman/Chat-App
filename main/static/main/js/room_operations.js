@@ -37,7 +37,7 @@ function createRoom(){
         }),
         success: function(data){
             if (data['status']==true){
-            window.location.href = '/chat/' + room_name
+                window.location.href = '/chat/' + data['room_name']
             }
             else if (data['status']==false){
                 $('#message').removeClass('d-none');

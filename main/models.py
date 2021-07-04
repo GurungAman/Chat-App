@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 # Create your models here.
 class Room(models.Model):
-    room = models.SlugField(max_length=50, unique=True)
+    room = models.CharField(max_length=50, unique=True)
     user_admin = models.ForeignKey(User,on_delete=models.CASCADE)
     # Users who can join the chat Room
     approved_users = models.ManyToManyField(User, related_name='approved_users', blank=True)
@@ -20,6 +21,10 @@ class Room(models.Model):
     
     def get_pending_requests(self):
         return self.pending_requests.all()
+    
+    def save(self, *args, **kwargs):
+        self.room = slugify(self.room)
+        super(Room, self).save(*args, **kwargs)
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
